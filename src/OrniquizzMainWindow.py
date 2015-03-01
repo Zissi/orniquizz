@@ -40,7 +40,7 @@ class OrniquizzMainWindow(QMainWindow):
         self.wrongAnswers = []
         self.answers = []
         self.birdsplayed = []
-        self.answerLeftTop.clicked.connect(self.check_answers) #@TODO
+        self.answerLeftTop.clicked.connect(self.check_answers)
         self.answerLeftBottom.clicked.connect(self.check_answers)
         self.answerRightTop.clicked.connect(self.check_answers)
         self.answerRightBottom.clicked.connect(self.check_answers)
@@ -61,7 +61,7 @@ class OrniquizzMainWindow(QMainWindow):
         
         self.next.clicked.connect(self.start_new_question)
 
-        self.translator = Translator("/media/zissi/Daten/ornidroid.sqlite")
+        self.translator = Translator("ornidroid.sqlite")
 
         self.dummipicture = QPixmap("birds.png").scaled(1000, 1000, Qt.KeepAspectRatio)
 
