@@ -8,6 +8,7 @@ from PyQt4 import uic
 from PyQt4.QtCore import pyqtSignature
 
 class ChooseGame(QDialog):
+    """Handles choosing the type of game."""
 
     def __init__(self, parent=None):
 
@@ -21,20 +22,14 @@ class ChooseGame(QDialog):
         self.BothButton.clicked.connect(self.ModeChosen)
         self.chosenbutton = self.IntermediateButton
         self.modebutton = self.ImageButton
-        
-    @pyqtSignature("")          
+
+    @pyqtSignature("")
     def GameChosen(self):
         self.chosenbutton = self.sender()
     
     def ModeChosen(self):
         self.modebutton = self.sender()
-    
 
-        
-    @pyqtSignature("")       
+    @pyqtSignature("")
     def on_StartButton_clicked(self):
         self.accept()
-
-        
-        
-        
