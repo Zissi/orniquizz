@@ -27,6 +27,7 @@ class OrniquizzMainWindow(QMainWindow):
         self.points = 0
         self.turns = 0
         self.m_media = None
+        self.quiz = None
         self.translator = Translator("externals/ornidroid/ornidroid/assets/ornidroid.jpg")
         self.dummipicture = QPixmap("birds.png").scaled(1000, 1000, Qt.KeepAspectRatio)
 
@@ -70,14 +71,6 @@ class OrniquizzMainWindow(QMainWindow):
         for button in self.buttons:
             button.setStyleSheet("")
             button.setEnabled(True)
-
-    def getAudio(self, answer):
-        soundpath = self.birds[answer]["Audio"]
-        output = Phonon.AudioOutput(Phonon.MusicCategory, self)
-        self.m_media = Phonon.MediaObject(self)
-        Phonon.createPath(self.m_media, output)
-        self.m_media.setCurrentSource(Phonon.MediaSource(soundpath))
-        self.m_media.play()
 
     @pyqtSignature("QString")
     def display_image(self, imagepath):
