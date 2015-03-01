@@ -38,6 +38,7 @@ class GenericQuiz(QObject):
             if (answer not in self.birds_played and
                 self.is_valid_answer(answer)):
                 data = True
+        self.birds_played.append(answer)
         return answer
 
     def check_answer(self, given_answer):
