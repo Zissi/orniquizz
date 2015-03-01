@@ -8,8 +8,6 @@ from Translator import Translator
 import sys
 from pprint import pprint
 from PyQt4.phonon import Phonon
-from PyQt4 import QtCore, QtGui
-
 
 try:
     import cPickle as pickle
@@ -40,62 +38,31 @@ class OrniquizzMainWindow(QMainWindow):
         self.wrongAnswers = []
         self.answers = []
         self.birdsplayed = []
-        self.answerLeftTop.clicked.connect(self.check_answers)
+
+        self.answerLeftTop.clicked.connect(self.check_answers) #@TODO
         self.answerLeftBottom.clicked.connect(self.check_answers)
         self.answerRightTop.clicked.connect(self.check_answers)
         self.answerRightBottom.clicked.connect(self.check_answers)
         
-        self.pauseButton.clicked.connect(self.pauseClicked)
-        self.playButton.clicked.connect(self.playClicked)
-
-        self.birdcountry = "DEU"
-        self.actionDeutschland.triggered.connect(self.setBirdcountry)
-        self.actionFrance.triggered.connect(self.setBirdcountry)
-        self.actionAll.triggered.connect(self.setBirdcountry)
-
-        self.language = "Deutsch"
-        self.actionDeutsch.triggered.connect(self.setLanguage)
-        self.actionFrancais.triggered.connect(self.setLanguage)
-        self.actionEnglish.triggered.connect(self.setLanguage)
-        self.actionScientific_Name.triggered.connect(self.setLanguage)
-        
         self.next.clicked.connect(self.start_new_question)
 
-        self.translator = Translator("ornidroid.sqlite")
+        self.translator = Translator("externals/ornidroid/ornidroid/assets/ornidroid.jpg")
 
         self.dummipicture = QPixmap("birds.png").scaled(1000, 1000, Qt.KeepAspectRatio)
 
         self.on_actionNeues_Spiel_triggered()
-        
-        self.pointdisplay.setSegmentStyle(QtGui.QLCDNumber.Flat)
-        
-    def pauseClicked(self):
-        self.m_media.pause()
     
-    def playClicked(self):
-        self.m_media.play()
-
-           
     def loadOrCreateBirds(self):
         pickleName = "birds.pkl"
         if os.path.exists(pickleName):
             with open(pickleName) as pickleFile:
                 birds = pickle.load(pickleFile)
         else:
-            self.translator = Translator("ornidroid.sqlite")
+            self.translator = Translator("externals/ornidroid/ornidroid/assets/ornidroid.jpg")
             birds = self.translator.createBirddic()
             with open(pickleName, "wb") as pickleFile:
                 pickle.dump(birds, pickleFile, protocol=pickle.HIGHEST_PROTOCOL) 
-        print birds
         return birds
-    
-    def setBirdcountry(self):
-        countrydic = {"Deutschland" : "DEU", "France" : "FRA", "All" : "All"}   
-        birdcountrykey = str(self.sender().text())
-        self.birdcountry = countrydic[birdcountrykey]
-    
-    def setLanguage(self):
-        self.language = str(self.sender().text())
     
     def startChooseGame(self):
         dialog = ChooseGame()
@@ -132,16 +99,16 @@ class OrniquizzMainWindow(QMainWindow):
             
     def getQuestionMedia(self):
         if self.GameMode == "Audio": 
-            self.getAudio(self.currentfolder)
-  
+            self.getAudio(self.currentfolder)  
+    
         elif self.GameMode == "Image":
             self.getImage(self.currentfolder)
-           
+            
         elif self.GameMode == "Both":
             self.getAudio(self.currentfolder)
             self.getImage(self.currentfolder)
- 
         
+
     def resetForNewQuestion(self):
         self.turns += 1
         self.bild1.setToolTip("") 
@@ -153,36 +120,24 @@ class OrniquizzMainWindow(QMainWindow):
     def getAnswerSinglequiz(self, GameMode):
         data = False
         while data == False:
-            if self.birdcountry == "All":
-                self.currentfolder = random.sample(self.birds, 1)[0]
-                if self.currentfolder not in self.birdsplayed and self.birds[self.currentfolder][str(self.GameMode)] is not None:
-                    data = True
-            else:
-                self.currentfolder = random.sample(self.birds, 1)[0]
-                if self.currentfolder not in self.birdsplayed and self.birds[self.currentfolder][str(self.GameMode)] is not None and self.birdcountry in self.birds[self.currentfolder]["Country"]:
-                    data = True
+            self.currentfolder = random.sample(self.birds, 1)[0]
+            if self.currentfolder not in self.birdsplayed and self.birds[self.currentfolder][str(self.GameMode)] is not None:
+                data = True
         return self.currentfolder
                 
                 
     def getAnswerBothquiz(self):
         data = False
         while data == False:
-            if self.birdcountry == "All":
-                self.currentfolder = random.sample(self.birds, 1)[0]
-                if self.birds[self.currentfolder][str("Audio")] is not None and self.birds[self.currentfolder][str("Image")] is not None:
-                    data = True
-            else:
-                self.currentfolder = random.sample(self.birds, 1)[0]
-                if self.birds[self.currentfolder][str("Audio")] is not None and self.birds[self.currentfolder][str("Image")] is not None and self.birdcountry in self.birds[self.currentfolder]["Country"]:
-                    data = True
+            self.currentfolder = random.sample(self.birds, 1)[0]
+            if self.birds[self.currentfolder][str("Audio")] is not None and self.birds[self.currentfolder][str("Image")] is not None:
+                data = True 
         return self.currentfolder
     
     
     def saveCurrentAnswer(self):
         self.birdsplayed.append(self.currentfolder)
-        self.currentbird = self.birds[self.currentfolder][self.language]
-
-
+        self.currentbird = self.translator.translate(self.currentfolder)
         
                 
     def getFamilyorOrder(self, difficulty):
@@ -250,14 +205,8 @@ class OrniquizzMainWindow(QMainWindow):
         
     def makeButtons(self):
         for idx, button in enumerate(self.buttons):
-            name = self.birds[self.wrongAnswers[idx]][self.language]
-            button.setText(name)
-        if self.GameMode == "Image":
-            self.pauseButton.hide()
-            self.playButton.hide()
-        else:
-            self.pauseButton.show()
-            self.playButton.show()
+            gername = self.translator.translate(self.wrongAnswers[idx])
+            button.setText(gername)
             
             
     @pyqtSignature("")      
@@ -275,6 +224,7 @@ class OrniquizzMainWindow(QMainWindow):
         self.progressTurns.setValue(self.turns)  
         self.bild1.setPixmap(self.dummipicture) 
         self.pointdisplay.display(self.points) 
+            
                              
     def check_answers(self):
         if self.GameMode != "Image": #@TODO: refactor!
@@ -288,11 +238,12 @@ class OrniquizzMainWindow(QMainWindow):
             button.setEnabled(False)
             
         if self.answerLeftTop.isEnabled() == False:    
-            self.bild1.setToolTip(self.birds[self.currentfolder]["Scientific Name"] + " " + self.birds[self.currentfolder]["Habitat"])
+            self.bild1.setToolTip(self.birds[self.currentfolder]["Scientific_Name"] + " " + self.birds[self.currentfolder]["Habitat"])
             
         self.pointdisplay.display(self.points)
-        self.progressTurns.setValue(self.turns)
-         
+        self.progressTurns.setValue(self.turns) 
+        
+          
     def correctAnswer(self):
         self.points += 1
         self.sender().setStyleSheet("background-color: rgb(154,205,50)")

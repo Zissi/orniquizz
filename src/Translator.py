@@ -25,29 +25,13 @@ class Translator(object):
             bird_id = None
         return bird_id
         
-    def getGername(self, folder):
+    def translate(self, folder):
         bird_id = self.folderToId(folder)
         if bird_id is None:
             return folder
         self.cursor.execute("SELECT c1taxon FROM taxonomy_content WHERE c0lang='de' AND c3bird_fk=?", (bird_id,))
         gername = self.cursor.fetchone()[0]
         return gername
-    
-    def getFrname(self, folder):
-        bird_id = self.folderToId(folder)
-        if bird_id is None:
-            return folder
-        self.cursor.execute("SELECT c1taxon FROM taxonomy_content WHERE c0lang='fr' AND c3bird_fk=?", (bird_id,))
-        frname = self.cursor.fetchone()[0]
-        return frname
-        
-    def getEnname(self, folder):
-        bird_id = self.folderToId(folder)
-        if bird_id is None:
-            return folder
-        self.cursor.execute("SELECT c1taxon FROM taxonomy_content WHERE c0lang='en' AND c3bird_fk=?", (bird_id,))
-        enname = self.cursor.fetchone()[0]
-        return enname
     
     def folderToFamily(self, folder):
         self.cursor.execute("SELECT scientific_family_fk FROM bird WHERE directory_name =?", (folder,))
@@ -77,26 +61,19 @@ class Translator(object):
     
     def folderToImagepath(self, folder):
         try:
-            for files in os.listdir(os.path.join("images", folder)):
+            for files in os.listdir(os.path.join("externals/ornidroid/ornidroid_images/src_images", folder)):
                 if os.path.splitext(files)[1] in self.extensions:
-                    return os.path.join("images", folder, files)
+                    return os.path.join("externals/ornidroid/ornidroid_images/src_images", folder, files)
         except OSError:
             pass
         
     def folderToAudiopath(self, folder):
         try:
-            for files in os.listdir(os.path.join("audio", folder)):
+            for files in os.listdir(os.path.join("externals/ornidroid/ornidroid_audio/src_audio", folder)):
                 if files.endswith(".mp3"):
-                    return os.path.join("audio", folder, files)
+                    return os.path.join("externals/ornidroid/ornidroid_audio/src_audio", folder, files)
         except OSError:
             pass
-        
-    def folderToCountry(self, folder):
-        bird_id = self.folderToId(folder)
-        self.cursor.execute("SELECT country_code FROM bird_country WHERE bird_fk=?", (bird_id,))
-        countries = [r[0] for r in self.cursor.fetchall()]
-        return countries
-        
         
     
     def createBirddic(self):
@@ -104,8 +81,8 @@ class Translator(object):
         self.cursor.execute("SELECT directory_name FROM bird")
         folders = [r[0] for r in self.cursor.fetchall()]
         for folder in folders:
-            birddic[folder] = {"ID" : self.folderToId(folder) , "Country" : self.folderToCountry(folder), "Deutsch" : self.getGername(folder), "Francais" : self.getFrname(folder), "English" : self.getEnname(folder), "Family" : self.folderToFamily(folder), "Order" : self.folderToOrder(folder),
-                               "Scientific Name" : self.folderToScientificName(folder), "Habitat" : self.folderToHabitat(folder), "Image" : self.folderToImagepath(folder), "Audio" : self.folderToAudiopath(folder)}
+            birddic[folder] = {"ID" : self.folderToId(folder), "german_Name" : self.translate(folder), "Family" : self.folderToFamily(folder), "Order" : self.folderToOrder(folder),
+                               "Scientific_Name" : self.folderToScientificName(folder), "Habitat" : self.folderToHabitat(folder), "Image" : self.folderToImagepath(folder), "Audio" : self.folderToAudiopath(folder)}
         return birddic
             
 
