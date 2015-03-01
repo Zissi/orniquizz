@@ -1,0 +1,6 @@
+/audio/*
+/images/*
+.project
+.pydevproject
+*~
+*.pyc
