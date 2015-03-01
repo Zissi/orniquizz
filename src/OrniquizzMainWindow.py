@@ -29,7 +29,6 @@ class OrniquizzMainWindow(QMainWindow):
         self.m_media = None
         self.quiz = None
         self.translator = Translator("externals/ornidroid/ornidroid/assets/ornidroid.jpg")
-        self.dummipicture = QPixmap("birds.png").scaled(1000, 1000, Qt.KeepAspectRatio)
 
         self._connect()
 
@@ -102,7 +101,10 @@ class OrniquizzMainWindow(QMainWindow):
         self.turns = 0
         self.points = 0
         self.progressTurns.setValue(self.turns)
-        self.bild1.setPixmap(self.dummipicture)
+        dummi_picture = QPixmap("birds.png").scaled(1000,
+                                                    1000,
+                                                    Qt.KeepAspectRatio)
+        self.bild1.setPixmap(dummi_picture)
         self.pointdisplay.display(self.points)
 
     def check_answers(self):
